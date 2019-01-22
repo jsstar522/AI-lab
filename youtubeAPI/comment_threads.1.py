@@ -60,6 +60,21 @@ def get_comments(youtube, video_id, page_token):
   ).execute()
   return results
 
+def get_replies(youtube, parent_id):
+  results = youtube.comments().list(
+    part="snippet",
+    parentId=parent_id,
+    textFormat="plainText"
+  ).execute()
+
+  for item in results["items"]:
+    author = item["snippet"]["authorDisplayName"]
+    text = item["snippet"]["textDisplay"]
+    print "Comment by %s: %s" % (author, text)
+
+  return results["items"]
+
+
 num = 0
 def load_comments(match):
   global num
@@ -98,8 +113,10 @@ if __name__ == "__main__":
   youtube = get_authenticated_service(args)
 
   try:
+    # get_replies(youtube, 'Ugydb3I_J5zlJzR1gsR4AaABAg')
     match = get_comments(youtube, args.videoid, None)
     load_comments(match)
+    
 
   except HttpError, e:
     print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
