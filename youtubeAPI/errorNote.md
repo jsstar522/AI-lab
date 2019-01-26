@@ -185,3 +185,4 @@ Test 콘솔에서는 `part`와 `videoID` 두개의 arguments만 받고 있지만
 
 ### Trail and Success
 
+`commentThread`말고 그냥 `comment` 메서드가 있다. 여기는 댓글 하나만 추출하는 메서드로 하나의 댓글 ID로 댓글 하나에 달린 대댓글 전부를 뽑아낼 수 있다. (**댓글 하나의 `id` = 많은 대댓글의 `parent id`**)

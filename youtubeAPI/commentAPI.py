@@ -99,15 +99,14 @@ def load_replies(id):
     num += 1
     print num
 
-## main
-if __name__ == "__main__":
-  argparser.add_argument(
-    "--videoid", help="Required; ID for video for which the comment will be inserted.")
+## vedeoid를 인자로 받아서 댓글 추출
+def get_allComments(videoid):
+  ## videoid를 인자로 받아서 args 새롭게 생성
+  argparser.add_argument("--videoid")
   args = argparser.parse_args()
-  if not args.videoid:
-    exit("Please specify videoid using the --videoid= parameter.")
+  args.videoid = videoid
 
-  ## client secrets와 discoveryDocument를 포함시킨다.
+  global youtube
   youtube = get_authenticated_service(args)
 
   try:
@@ -117,4 +116,4 @@ if __name__ == "__main__":
   except HttpError, e:
     print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
   else:
-    print "Inserted, listed and updated top-level comments."
+    print "################### All Comments of One Video ###################"
