@@ -80,9 +80,9 @@ num = 0
 def load_comments(match):
   global num
   for item in match["items"]:
-    print item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+    print (item["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
     num += 1
-    print num
+    print (num)
     ## 현재 "최상위 댓글"의 id 전달, 대댓글 확인
     id = item["snippet"]["topLevelComment"]["id"]
     load_replies(id)
@@ -95,25 +95,29 @@ def load_replies(id):
   global num
   match = get_replies(youtube, id)
   for item in match["items"]:
-    print item["snippet"]["textDisplay"]
+    print (item["snippet"]["textDisplay"])
     num += 1
-    print num
+    print (num)
+
+## videoid를 인자로 받아서 args 새롭게 생성
+global args
+args = argparser.parse_args()
+argparser.add_argument("--videoid")
 
 ## vedeoid를 인자로 받아서 댓글 추출
 def get_allComments(videoid):
-  ## videoid를 인자로 받아서 args 새롭게 생성
-  argparser.add_argument("--videoid")
-  args = argparser.parse_args()
   args.videoid = videoid
 
   global youtube
   youtube = get_authenticated_service(args)
-
+  
   try:
     match = get_comments(youtube, args.videoid, None)
     load_comments(match)
     
-  except HttpError, e:
-    print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
+  except (HttpError, e):
+    print ("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
   else:
-    print "################### All Comments of One Video ###################"
+    print ("################### All Comments of One Video ###################")
+
+
