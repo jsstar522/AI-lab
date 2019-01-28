@@ -37,3 +37,18 @@ Youtube API가 제공하는 수많은 메서드 중에서 댓글을 추출할 �
 * `pageToken`
 
 * `textFormat`
+
+
+
+
+
+### 필요한 라이브러리
+
+httplib2
+
+apiclient
+
+apiclient.discovery - `sudo pip3 install --upgrade google-api-python-client`으로 설치
+oauth2client
+
+googleapiclient - `pip3 install --upgrade google-api-python-client --user`으로 설치
