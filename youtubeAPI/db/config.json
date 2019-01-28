@@ -1,0 +1,42 @@
+{
+  "configure": {
+    "tableName": "news",
+    "tableInfo": {
+      "primaryKey": "newsID",
+      "tableAttr": {
+        "title": "",
+        "author": "",
+        "createdAt": "",
+        "nation": "",
+        "trade": "",
+        "abstract": "",
+        "type": "",
+        "recommendNumber": 0,
+        "attachedFiles": [],
+        "images": [],
+        "tables": [],
+        "paragraphs": []
+      }
+    }
+  },
+  "development": {
+    "mongodb": {
+      "uri": "mongodb://localhost:27017"
+    },
+    "dynamodb": {
+
+    }
+  },
+  "production": {
+    "mongodb": {
+      "uri": "mongodb://ds145474.mlab.com:45474",
+      "user": {
+        "id": "mineralwater",
+        "pw": "alspfkfdnjxj123"
+      }
+    },
+    "dynamodb": {
+
+    }
+  }
+}
