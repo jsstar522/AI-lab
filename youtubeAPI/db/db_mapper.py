@@ -74,8 +74,6 @@ class DBMapper:
                 if attr_key in self.info:
                     continue
                 self.info[attr_key] = copy.deepcopy(self.configure['tableInfo']['tableAttr'][attr_key])
-            #self.init()
-            print("############################set_info primary key#####", self.info[self.primary_key])
 
     def update(self, _dict):  # UPDATE, SET
         self.put_items(_dict)
@@ -83,7 +81,6 @@ class DBMapper:
             self.db.collection.update({self.primary_key: self.info[self.primary_key]}, {"$set": self.info}, True)
         elif self.chosen_db is "dynamodb":
             self.retry_exception("update", _dict)
-            print("###########################set_content primary key###", self.info[self.primary_key])
 
     def delete(self, _dict):  # DELETE
         if self.chosen_db is "mongodb":

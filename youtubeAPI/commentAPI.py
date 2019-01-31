@@ -91,12 +91,28 @@ def load_comments(match):
 
   global num
   for item in match["items"]:
-    print (item["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
+    ## 유형
+    type = "topLevelComment"
+    ## 최상위 댓글
+    commentDisplay = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+    ## 최상위 댓글 id
+    id = item["snippet"]["topLevelComment"]["id"]
+    ## 최상위 댓글 작성자
+    commentAuthor = item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"]
+    commentAuthorId = item["snippet"]["topLevelComment"]["snippet"]["authorChannelId"]["value"]
+    ## 작성날짜
+    commentDate = item["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
+    ## 좋아요
+    commentLikeCount = item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+
+    ## db 추가
+    news.add_comments(commentDisplay, commentAuthor)
+
+    ## 개수
     num += 1
     print (num)
-    news.add_paragraph(num)
+
     ## 현재 "최상위 댓글"의 id 전달, 대댓글 확인
-    id = item["snippet"]["topLevelComment"]["id"]
     load_replies(id)
   if "nextPageToken" in match:
     match = get_comments(youtube, args.videoid, match["nextPageToken"])
@@ -107,7 +123,26 @@ def load_replies(id):
   global num
   match = get_replies(youtube, id)
   for item in match["items"]:
-    print (item["snippet"]["textDisplay"])
+    ## 유형
+    type = "reply"
+    ## 대댓글
+    commentDisplay = item["snippet"]["textDisplay"]
+    ## 부모댓글 id
+    parentId = item["snippet"]["parentId"]
+    ## 대댓글 id
+    id = item["id"]
+    ## 대댓글 작성자
+    commentAuthor = item["snippet"]["authorDisplayName"]
+    commentAuthorId = item["snippet"]["authorChannelId"]["value"]
+    ## 작성날짜
+    commentDate = item["snippet"]["publishedAt"]
+    ## 좋아요
+    commentLikeCount = item["snippet"]["likeCount"]
+
+    ## db 추가
+    news.add_comments(commentDisplay, commentAuthor)
+    
+    ## 개수
     num += 1
     print (num)
 
@@ -118,10 +153,11 @@ argparser.add_argument("--videoid")
 
 ## vedeoid를 인자로 받아서 댓글 추출
 def get_allComments(videoid):
+  ## video ID
   args.videoid = videoid
 
   news.init()
-  news.set_info(dict(newsID=args.videoid, title="test title", type="test type", createdAt="test createAT" if environment["db"] is "mongodb" else "not mongo", author="test author", nation="test nation", trade="trade", recommendNumber="test recommend", attachedFiles="test attachedFiles"))
+  news.set_info(dict(videoID=args.videoid, title="test", type="test type", createdAt="test createAT" if environment["db"] is "mongodb" else "not mongo", author="test author", nation="test nation", trade="trade", recommendNumber="test recommend", attachedFiles="test attachedFiles"))
 
   global youtube
   youtube = get_authenticated_service(args)
@@ -149,7 +185,15 @@ if __name__ == "__main__":
   args = parser.parse_args()
 # parser.add_argumnet('--order', help='Order', default='date')
 
-  for videoid in searchAPI.youtube_search(args):
-    if news.is_exist(dict(newsID=videoid)):
+  for video in searchAPI.youtube_search(args):
+    ## 존재하는 videoID이면 건너뛰기
+    if news.is_exist(dict(videoID=video['id']['videoId'])):
       continue
-    get_allComments(videoid)
+
+    ## infromation of video
+    print (video)
+
+
+    ## 댓글 추출
+    get_allComments(video['id']['videoId'])
+

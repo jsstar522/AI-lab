@@ -22,18 +22,13 @@ class News:
         if self.is_exist(_dict):
             return
         self.mapper.insert(_dict)
-        print(self.mapper.info)
-        print("###################set_info###################")
 
     def set_contents(self):
         self.mapper.update(self.mapper.info)
-        print(self.mapper.info)
-        print("#####################set_contents###############")
 
-    def add_paragraph(self, _content):
-        paragraph = {"line_num": "aaa", "content": str(_content)}
-        self.mapper.info["paragraphs"].append(paragraph)
-        print(self.mapper.info)
+    def add_comments(self, _textDisplay, _author):
+        comment = {"textDisplay": str(_textDisplay), "author": str(_author)}
+        self.mapper.info["comments"].append(comment)
 
     def delete_item(self, _dict):
         self.mapper.delete(_dict)

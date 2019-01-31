@@ -1,21 +1,17 @@
 {
   "configure": {
-    "tableName": "news",
+    "tableName": "youtubeComments",
     "tableInfo": {
-      "primaryKey": "newsID",
+      "primaryKey": "videoID",
       "tableAttr": {
         "title": "",
         "author": "",
         "createdAt": "",
-        "nation": "",
-        "trade": "",
         "abstract": "",
         "type": "",
-        "recommendNumber": 0,
-        "attachedFiles": [],
-        "images": [],
-        "tables": [],
-        "paragraphs": []
+        "likeCount": 0,
+        "unlikeCount": 0,
+        "comments": []
       }
     }
   },
