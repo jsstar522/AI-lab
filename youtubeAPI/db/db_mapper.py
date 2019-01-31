@@ -3,6 +3,7 @@ import db.simple_mongo_db
 import json
 import copy
 import random, time
+import yaml, logging
 from bson.objectid import ObjectId
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
@@ -12,6 +13,14 @@ class DBMapper:
                         'ThrottlingException')
 
     def __init__(self, _json_file_path="db/config.json", _status="development", _chosen_db="dynamodb"):
+
+        # Construct the logger named DBMapper aka class name
+#        with open('debug_config.yml', 'r') as f:
+#            config = yaml.safe_load(f.read())
+#            logging.config.dictConfig(config)
+#        self.logger = logging.getLogger('db_logger.{0}'.format(self.__class__.__qualname__))
+
+        # Read the json configuration file
         with open(_json_file_path, encoding='UTF8') as f:
             self.data = json.load(f)
 
@@ -41,21 +50,21 @@ class DBMapper:
             # return self.db.collection.find({self.primary_key: _dict[self.primary_key]})
             return self.db.collection.find(_dict)
         elif self.chosen_db is "dynamodb":
-            """ I used scan() method here.
-            It returns list though any items don't exist
+            """ I used query() method here.
+            It returns list even if any items don't exist
             
             get_item() method returns object.
             But get_item() returns Error if item does not exist.
             """
-            print(self.db.table.creation_date_time)
-            print(self.primary_key, _dict[self.primary_key])
+#            self.logger.debug(self.db.table.creation_date_time)
+#            self.logger.debug(self.primary_key, _dict[self.primary_key])
             table_scan = self.retry_exception("select", _dict)
-            print(table_scan)
+#            self.logger.debug(table_scan)
             return table_scan
 
     def insert(self, _dict):  # CREATE
         self.put_items(_dict)
-        print(self.info)
+#        self.logger.debug(self.info)
         if self.chosen_db is "mongodb":
             self.db.collection.insert_one(self.info)
             self.init()
@@ -65,6 +74,8 @@ class DBMapper:
                 if attr_key in self.info:
                     continue
                 self.info[attr_key] = copy.deepcopy(self.configure['tableInfo']['tableAttr'][attr_key])
+            #self.init()
+            print("############################set_info primary key#####", self.info[self.primary_key])
 
     def update(self, _dict):  # UPDATE, SET
         self.put_items(_dict)
@@ -72,6 +83,7 @@ class DBMapper:
             self.db.collection.update({self.primary_key: self.info[self.primary_key]}, {"$set": self.info}, True)
         elif self.chosen_db is "dynamodb":
             self.retry_exception("update", _dict)
+            print("###########################set_content primary key###", self.info[self.primary_key])
 
     def delete(self, _dict):  # DELETE
         if self.chosen_db is "mongodb":
@@ -101,8 +113,8 @@ class DBMapper:
         while True:
             try:
                 if _str == "select":
-                    result = self.db.table.scan(
-                        FilterExpression=Attr(self.primary_key).eq(str(_dict[self.primary_key]))
+                    result = self.db.table.query(
+                        KeyConditionExpression=Key(self.primary_key).eq(str(_dict[self.primary_key]))
                     )
                     return result
                 elif _str == "insert":
@@ -126,7 +138,7 @@ class DBMapper:
             except ClientError as err:
                 if err.response['Error']['Code'] not in DBMapper.RETRY_EXCEPTIONS:
                     raise
-                print('WHOA, too fast, slow it down retries={0}'.format(self.retries))
+#                self.logger.debug('WHOA, too fast, slow it down retries={0}'.format(self.retries))
                 # sleep(2 ** self.retries)
                 # fulljitter : https://aws.amazon.com/ko/blogs/architecture/exponential-backoff-and-jitter/
                 fulljitter = random.uniform(0, 2 ** self.retries)

@@ -10,6 +10,16 @@ from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
+# # aws db mapping
+ENV = "AWS"
+
+environment = {
+    "AWS": {
+        "status": "production",
+        "db": "dynamodb",
+    }
+}
+environment = environment[ENV]
 
 # # client secrets file
 CLIENT_SECRETS_FILE = "client_secrets.json"
@@ -78,11 +88,13 @@ def get_replies(youtube, parent_id):
 num = 0
 ## "최상위 댓글"의 전체 payload를 get_comments로 가져왔으므로 속성별로 나누는 메서드
 def load_comments(match):
+
   global num
   for item in match["items"]:
     print (item["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
     num += 1
     print (num)
+    news.add_paragraph(num)
     ## 현재 "최상위 댓글"의 id 전달, 대댓글 확인
     id = item["snippet"]["topLevelComment"]["id"]
     load_replies(id)
@@ -108,16 +120,36 @@ argparser.add_argument("--videoid")
 def get_allComments(videoid):
   args.videoid = videoid
 
+  news.init()
+  news.set_info(dict(newsID=args.videoid, title="test title", type="test type", createdAt="test createAT" if environment["db"] is "mongodb" else "not mongo", author="test author", nation="test nation", trade="trade", recommendNumber="test recommend", attachedFiles="test attachedFiles"))
+
   global youtube
   youtube = get_authenticated_service(args)
-  
+
   try:
     match = get_comments(youtube, args.videoid, None)
     load_comments(match)
+    news.set_contents()
     
-  except (HttpError, e):
+  except HttpError as e:
     print ("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
   else:
     print ("################### All Comments of One Video ###################")
 
+if __name__ == "__main__":
+  import argparse
+  import searchAPI
 
+  from news import News
+  news = News(_status=environment["status"], _chosen_db=environment["db"])
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--q', help='Search term', default='merry_nee')
+  parser.add_argument('--max-results', help='Max results', default=25)
+  args = parser.parse_args()
+# parser.add_argumnet('--order', help='Order', default='date')
+
+  for videoid in searchAPI.youtube_search(args):
+    if news.is_exist(dict(newsID=videoid)):
+      continue
+    get_allComments(videoid)
