@@ -85,6 +85,14 @@ def get_replies(youtube, parent_id):
   ).execute()
   return results
 
+## 비디오 통계치(좋아요, 조회수...) 추출
+def get_videoStatistics(youtube, video_id):
+  results = youtube.videos().list(
+    part='statistics',
+    id=video_id
+  ).execute()
+  return results
+
 num = 0
 ## "최상위 댓글"의 전체 payload를 get_comments로 가져왔으므로 속성별로 나누는 메서드
 def load_comments(match):
@@ -95,6 +103,9 @@ def load_comments(match):
     type = "topLevelComment"
     ## 최상위 댓글
     commentDisplay = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+    ## 부모댓글 = 없음
+    parentId = None
+
     ## 최상위 댓글 id
     id = item["snippet"]["topLevelComment"]["id"]
     ## 최상위 댓글 작성자
@@ -106,7 +117,7 @@ def load_comments(match):
     commentLikeCount = item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
 
     ## db 추가
-    news.add_comments(commentDisplay, commentAuthor)
+    news.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
 
     ## 개수
     num += 1
@@ -139,9 +150,9 @@ def load_replies(id):
     ## 좋아요
     commentLikeCount = item["snippet"]["likeCount"]
 
-    ## db 추가
-    news.add_comments(commentDisplay, commentAuthor)
-    
+    ## db 추가 
+    news.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
+
     ## 개수
     num += 1
     print (num)
@@ -156,11 +167,22 @@ def get_allComments(videoid):
   ## video ID
   args.videoid = videoid
 
-  news.init()
-  news.set_info(dict(videoID=args.videoid, title="test", type="test type", createdAt="test createAT" if environment["db"] is "mongodb" else "not mongo", author="test author", nation="test nation", trade="trade", recommendNumber="test recommend", attachedFiles="test attachedFiles"))
-
   global youtube
   youtube = get_authenticated_service(args)
+  
+  ## infromation of video
+  title = video["snippet"]["title"]
+  author = video["snippet"]["channelTitle"]
+  createAt = video["snippet"]["publishedAt"]
+  #discription = video["snippet"]["discription"]
+  channelId = video["snippet"]["channelId"]
+  statistics = get_videoStatistics(youtube, args.videoid)
+  viewCount = statistics["items"][0]["statistics"]["viewCount"]
+  likeCount = statistics["items"][0]["statistics"]["likeCount"]
+  dislikeCount = statistics["items"][0]["statistics"]["dislikeCount"]
+
+  news.init()
+  news.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
   try:
     match = get_comments(youtube, args.videoid, None)
@@ -187,12 +209,8 @@ if __name__ == "__main__":
 
   for video in searchAPI.youtube_search(args):
     ## 존재하는 videoID이면 건너뛰기
-    if news.is_exist(dict(videoID=video['id']['videoId'])):
+    if news.is_exist(dict(videoID=video["id"]["videoId"])):
       continue
-
-    ## infromation of video
-    print (video)
-
 
     ## 댓글 추출
     get_allComments(video['id']['videoId'])

@@ -7,10 +7,10 @@
         "title": "",
         "author": "",
         "createdAt": "",
-        "abstract": "",
-        "type": "",
+        "channelId": "",
+        "viewCount": 0,
         "likeCount": 0,
-        "unlikeCount": 0,
+        "dislikeCount": 0,
         "comments": []
       }
     }

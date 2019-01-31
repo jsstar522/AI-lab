@@ -26,8 +26,8 @@ class News:
     def set_contents(self):
         self.mapper.update(self.mapper.info)
 
-    def add_comments(self, _textDisplay, _author):
-        comment = {"textDisplay": str(_textDisplay), "author": str(_author)}
+    def add_comments(self, _type, _id, _parentId, _commentDisplay, _commentAuthor, _commentAuthorId, _commentDate, _commentLikeCount):
+        comment = {"type": str(_type), "id": str(_id), "parentId": str(_parentId), "commentDisplay": str(_commentDisplay), "commentAuthor": str(_commentAuthor), "commentAuthorId": str(_commentAuthorId), "commentDate": str(_commentDate), "commentLikeCount": int(_commentLikeCount)}
         self.mapper.info["comments"].append(comment)
 
     def delete_item(self, _dict):
