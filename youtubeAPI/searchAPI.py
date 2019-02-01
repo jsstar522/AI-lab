@@ -5,9 +5,7 @@ import argparse
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-
-## API KEY https://cloud.google.com/console
-DEVELOPER_KEY = 'AIzaSyCyJotl20tvJ7iW2ERC8rWy8llyFEmVeds'
+DEVELOPER_KEY = #<Put your API Key>#
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 
@@ -39,4 +37,4 @@ def youtube_search():
   return videos
 
 if __name__ == "__main__":
-  print(youtube_search(args))
+  print(youtube_search())

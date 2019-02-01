@@ -10,6 +10,8 @@ from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
+from googleapiclient.discovery import build
+
 # # aws db mapping
 ENV = "AWS"
 
@@ -21,7 +23,7 @@ environment = {
 }
 environment = environment[ENV]
 
-# # client secrets file
+## client secrets file
 CLIENT_SECRETS_FILE = "client_secrets.json"
 
 YOUTUBE_READ_WRITE_SSL_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
@@ -118,6 +120,7 @@ def load_comments(match):
 
     ## db 추가
     comments.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
+    print(commentDisplay)
 
     ## 개수
     num += 1
@@ -152,6 +155,7 @@ def load_replies(id):
 
     ## db 추가 
     comments.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
+    print(commentDisplay)
 
     ## 개수
     num += 1
@@ -197,15 +201,14 @@ def get_allComments(videoid):
 if __name__ == "__main__":
   import argparse
   import searchAPI
-
   from comments import Comments
+
   comments = Comments(_status=environment["status"], _chosen_db=environment["db"])
 
   for video in searchAPI.youtube_search():
     ## 존재하는 videoID이면 건너뛰기
     if comments.is_exist(dict(videoID=video["id"]["videoId"])):
       continue
-
     ## 댓글 추출 시작
     get_allComments(video['id']['videoId'])
 
