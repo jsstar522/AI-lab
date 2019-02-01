@@ -117,7 +117,7 @@ def load_comments(match):
     commentLikeCount = item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
 
     ## db 추가
-    news.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
+    comments.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
 
     ## 개수
     num += 1
@@ -151,7 +151,7 @@ def load_replies(id):
     commentLikeCount = item["snippet"]["likeCount"]
 
     ## db 추가 
-    news.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
+    comments.add_comments(type, id, parentId, commentDisplay, commentAuthor, commentAuthorId, commentDate, commentLikeCount)
 
     ## 개수
     num += 1
@@ -181,13 +181,13 @@ def get_allComments(videoid):
   likeCount = statistics["items"][0]["statistics"]["likeCount"]
   dislikeCount = statistics["items"][0]["statistics"]["dislikeCount"]
 
-  news.init()
-  news.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
+  comments.init()
+  comments.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
   try:
     match = get_comments(youtube, args.videoid, None)
     load_comments(match)
-    news.set_contents()
+    comments.set_contents()
     
   except HttpError as e:
     print ("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
@@ -198,20 +198,14 @@ if __name__ == "__main__":
   import argparse
   import searchAPI
 
-  from news import News
-  news = News(_status=environment["status"], _chosen_db=environment["db"])
+  from comments import Comments
+  comments = Comments(_status=environment["status"], _chosen_db=environment["db"])
 
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--q', help='Search term', default='merry_nee')
-  parser.add_argument('--max-results', help='Max results', default=25)
-  args = parser.parse_args()
-# parser.add_argumnet('--order', help='Order', default='date')
-
-  for video in searchAPI.youtube_search(args):
+  for video in searchAPI.youtube_search():
     ## 존재하는 videoID이면 건너뛰기
-    if news.is_exist(dict(videoID=video["id"]["videoId"])):
+    if comments.is_exist(dict(videoID=video["id"]["videoId"])):
       continue
 
-    ## 댓글 추출
+    ## 댓글 추출 시작
     get_allComments(video['id']['videoId'])
 

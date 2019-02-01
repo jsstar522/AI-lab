@@ -11,7 +11,14 @@ DEVELOPER_KEY = 'AIzaSyCyJotl20tvJ7iW2ERC8rWy8llyFEmVeds'
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 
-def youtube_search(options):
+def youtube_search():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--q', help='Search term', default='merry_nee')
+  parser.add_argument('--max-results', help='Max results', default=25)
+  args = parser.parse_args()
+  # parser.add_argumnet('--order', help='Order', default='date')
+
+
   youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
 
@@ -19,8 +26,8 @@ def youtube_search(options):
   # query term.
   search_response = youtube.search().list(
     part='id,snippet',
-    q=options.q,
-    maxResults=options.max_results,
+    q=args.q,
+    maxResults=args.max_results,
     # order=options.order,
   ).execute()
 
@@ -30,3 +37,6 @@ def youtube_search(options):
     if search_result['id']['kind'] == 'youtube#video':
       videos.append(search_result)
   return videos
+
+if __name__ == "__main__":
+  print(youtube_search(args))

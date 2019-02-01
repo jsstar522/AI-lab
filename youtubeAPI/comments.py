@@ -6,7 +6,7 @@ import os
 
 from db.db_mapper import DBMapper
 
-class News:
+class Comments:
     def __init__(self, _json_file_path="db/config.json", _status="development", _chosen_db="dynamodb"):
         self.mapper = DBMapper(_json_file_path, _status, _chosen_db)
 
