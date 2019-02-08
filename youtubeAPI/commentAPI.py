@@ -192,6 +192,7 @@ def get_allComments(videoid):
   comments.init()
   comments.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
+  ## 본격적인 댓글 추출 시작
   try:
     match = get_comments(youtube, args.videoid, None)
     load_comments(match)
