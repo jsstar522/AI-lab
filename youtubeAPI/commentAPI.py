@@ -162,11 +162,6 @@ def load_replies(id):
     num += 1
     print (num)
 
-## videoid를 인자로 받아서 args 새롭게 생성
-global args
-args = argparser.parse_args()
-argparser.add_argument("--videoid")
-
 ## vedeoid를 인자로 받아서 댓글 추출
 def get_allComments(videoid):
   ## video ID
