@@ -95,8 +95,9 @@ def get_videoStatistics(youtube, video_id):
   ).execute()
   return results
 
-num = 0
 ## "최상위 댓글"의 전체 payload를 get_comments로 가져왔으므로 속성별로 나누는 메서드
+## 댓글 개수 print(num)
+num = 0
 def load_comments(match):
 
   global num
@@ -176,15 +177,23 @@ def get_allComments(videoid):
   
   ## infromation of video
   title = video["snippet"]["title"]
+  print('<<', title, '>>')
   author = video["snippet"]["channelTitle"]
   createAt = video["snippet"]["publishedAt"]
   #discription = video["snippet"]["discription"]
   channelId = video["snippet"]["channelId"]
+  ## 비디오 통계치
+  ## 좋아요, 싫어요를 표시하지 않는 경우도 있다.
   statistics = get_videoStatistics(youtube, args.videoid)
   viewCount = statistics["items"][0]["statistics"]["viewCount"]
-  likeCount = statistics["items"][0]["statistics"]["likeCount"]
-  dislikeCount = statistics["items"][0]["statistics"]["dislikeCount"]
+  if "likeCount" in statistics["items"][0]["statistics"]:
+    likeCount = statistics["items"][0]["statistics"]["likeCount"]
+    dislikeCount = statistics["items"][0]["statistics"]["dislikeCount"]
+  else:
+    likeCount = "Unknown"
+    dislikeCount = "Unknown"
 
+  ## db 테이블 생성
   comments.init()
   comments.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
@@ -199,13 +208,27 @@ def get_allComments(videoid):
     print ("################### All Comments of One Video ###################")
 
 if __name__ == "__main__":
-  import argparse
   import searchAPI
   from comments import Comments
 
+  ## videoid를 인자로 받아서 args 새롭게 생성
+  argparser.add_argument("--keyword",
+    help="Required; KEYWORD for search videos")
+  argparser.add_argument("--resultSize", type = int,
+    help="Required; Number of searched video lists")
+  argparser.add_argument("--videoid")
+  args = argparser.parse_args()
+  print(args)
+
+  if not args.keyword:
+    exit("Please specify keword for search videos using the --keyword='<parameter>'.")
+  if not args.resultSize:
+    exit("Please specify number of searched video lists using the --resultSize='<parameter>'.")
+
+  ## db handling 메서드 가져오기
   comments = Comments(_status=environment["status"], _chosen_db=environment["db"])
 
-  for video in searchAPI.youtube_search():
+  for video in searchAPI.youtube_search(None, args.resultSize, args.keyword):
     ## 존재하는 videoID이면 건너뛰기
     if comments.is_exist(dict(videoID=video["id"]["videoId"])):
       continue

@@ -40,9 +40,7 @@ Google API를 사용하기 위해서 사용자인증과 토큰 발급이 필요�
 
 ## AWS DB 설정
 
-*https://github.com/pseudotop/crawler-news 을 참고하고 AWS db에 관련된 모듈은 모두 여기에 있는 내용을 조금만 변형했습니다.*
-
-
+*https://github.com/pseudotop/crawler-news 을 참고하고 AWS db에 관련된 모듈은 모두 여기에 있는 내용을 약간만 바꿨습니다.*
 
 ## Youtube API commentThreads
 
