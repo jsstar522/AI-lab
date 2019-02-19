@@ -8,7 +8,7 @@ YOUTUBE_API_VERSION = 'v3'
 
 videos = []
 
-def youtube_search(page_token, resultSize, keyword):
+def youtube_search(page_token, resultSize, keyword, region_code):
 
   youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
@@ -19,6 +19,7 @@ def youtube_search(page_token, resultSize, keyword):
     q=keyword,
     maxResults=50,
     pageToken=page_token,
+    regionCode=region_code,
     # order=options.order,
   ).execute()
 
