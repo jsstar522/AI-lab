@@ -163,7 +163,7 @@ def load_replies(id):
     print (num)
 
 ## vedeoid를 인자로 받아서 댓글 추출
-def get_allComments(videoid):
+def get_allComments(videoid, keyword):
   ## video ID
   args.videoid = videoid
 
@@ -190,7 +190,7 @@ def get_allComments(videoid):
 
   ## db 테이블 생성
   comments.init()
-  comments.set_info(dict(videoID=args.videoid, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
+  comments.set_info(dict(videoID=args.videoid, searchKeyword=keyword, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
   ## 본격적인 댓글 추출 시작
   try:
@@ -229,5 +229,6 @@ if __name__ == "__main__":
     if comments.is_exist(dict(videoID=video["id"]["videoId"])):
       continue
     ## 댓글 추출 시작
-    get_allComments(video['id']['videoId'])
+    ## 검색 키워드, 검색 국가를 테이블 생성시 쓸 수 있도록 인자로 전달
+    get_allComments(video['id']['videoId'], args.keyword)
 
