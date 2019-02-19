@@ -163,7 +163,7 @@ def load_replies(id):
     print (num)
 
 ## vedeoid를 인자로 받아서 댓글 추출
-def get_allComments(videoid, keyword):
+def get_allComments(videoid, keyword, region):
   ## video ID
   args.videoid = videoid
 
@@ -172,6 +172,8 @@ def get_allComments(videoid, keyword):
   
   ## infromation of video
   title = video["snippet"]["title"]
+  keyword = keyword
+  region = region
   print('<<', title, '>>')
   author = video["snippet"]["channelTitle"]
   createAt = video["snippet"]["publishedAt"]
@@ -190,7 +192,7 @@ def get_allComments(videoid, keyword):
 
   ## db 테이블 생성
   comments.init()
-  comments.set_info(dict(videoID=args.videoid, searchKeyword=keyword, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
+  comments.set_info(dict(videoID=args.videoid, searchKeyword=keyword, regionCode=region, title=title, author=author, createdAt=createAt, channelId=channelId, viewCount=int(viewCount), likeCount=int(likeCount), dislikeCount=int(dislikeCount)))
 
   ## 본격적인 댓글 추출 시작
   try:
@@ -212,7 +214,9 @@ if __name__ == "__main__":
     help="Required; KEYWORD for search videos")
   argparser.add_argument("--resultSize", type = int,
     help="Required; Number of searched video lists")
-  argparser.add_argument("--videoid")
+  argparser.add_argument("--regionCode",
+    help="Required; Region code means which country where you search")
+  
   args = argparser.parse_args()
   print(args)
 
@@ -220,15 +224,17 @@ if __name__ == "__main__":
     exit("Please specify keword for search videos using the --keyword='<parameter>'.")
   if not args.resultSize:
     exit("Please specify number of searched video lists using the --resultSize='<parameter>'.")
+  if not args.regionCode:
+    exit("Please specify regionCode --regionCode='<parameter>'.")
 
   ## db handling 메서드 가져오기
   comments = Comments(_status=environment["status"], _chosen_db=environment["db"])
 
-  for video in searchAPI.youtube_search(None, args.resultSize, args.keyword):
+  for video in searchAPI.youtube_search(None, args.resultSize, args.keyword, args.regionCode):
     ## 존재하는 videoID이면 건너뛰기
     if comments.is_exist(dict(videoID=video["id"]["videoId"])):
       continue
     ## 댓글 추출 시작
     ## 검색 키워드, 검색 국가를 테이블 생성시 쓸 수 있도록 인자로 전달
-    get_allComments(video['id']['videoId'], args.keyword)
+    get_allComments(video['id']['videoId'], args.keyword, args.regionCode)
 
