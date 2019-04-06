@@ -34,7 +34,7 @@ def youtube_search(page_token, resultSize, keyword, region_code):
   ## 비디오 리스트 다음페이지가 없을 때까지 재귀호출
   if "nextPageToken" in search_response:
     print(search_response["nextPageToken"])
-    youtube_search(search_response["nextPageToken"], resultSize)
+    youtube_search(search_response["nextPageToken"], resultSize, keyword, region_code)
 
   return videos
 
