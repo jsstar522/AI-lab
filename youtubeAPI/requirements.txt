@@ -5,7 +5,7 @@ botocore==1.12.77
 bs4==0.0.1
 docutils==0.14
 jmespath==0.9.3
-lxml==4.3.0
+lxml==4.6.3
 psutil==5.5.0
 pymongo==3.7.2
 python-dateutil==2.7.5
